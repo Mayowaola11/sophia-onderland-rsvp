@@ -7,8 +7,3 @@
   for = "/*"
   [headers.values]
     Cache-Control = "max-age=3600"
-
-[build]
-  publish = "public"
-  functions = "functions"
-  command = "npm run build"
