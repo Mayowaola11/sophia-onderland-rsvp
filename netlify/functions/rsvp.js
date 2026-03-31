@@ -6,7 +6,6 @@ exports.handler = async (event) => {
   try {
     const body = JSON.parse(event.body || "{}");
 
-    // Basic bot trap
     if (safeString(body.website)) {
       return jsonResponse(200, { message: "RSVP received." });
     }
@@ -17,6 +16,7 @@ exports.handler = async (event) => {
     const attending = safeString(body.attending, 3);
     const message = safeString(body.message, 1500);
     const dietaryNotes = safeString(body.dietaryNotes, 1000);
+    const accommodationAssistance = safeString(body.accommodationAssistance, 1000);
 
     let numberOfAdults = toNonNegativeInt(body.numberOfAdults);
     let numberOfChildren = toNonNegativeInt(body.numberOfChildren);
@@ -34,9 +34,23 @@ exports.handler = async (event) => {
       numberOfChildren = 0;
     }
 
-    if (attending === "yes" && (numberOfAdults + numberOfChildren < 1)) {
+    if (attending === "yes" && numberOfAdults + numberOfChildren < 1) {
       return jsonResponse(400, {
         error: "At least one attendee must be specified if attending."
+      });
+    }
+
+    const supabaseUrl = process.env.SUPABASE_URL;
+    const supabaseServiceRole = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    const formspreeFormId = process.env.FORMSPREE_FORM_ID;
+    const publicSiteUrl = process.env.PUBLIC_SITE_URL || "https://olatunjiayo.com";
+    const eventName =
+      process.env.RSVP_EVENT_NAME ||
+      "The ONE-derland: Welcome to BIG SOPHIA first birthday party";
+
+    if (!supabaseUrl || !supabaseServiceRole || !formspreeFormId) {
+      return jsonResponse(500, {
+        error: "Missing server environment variables."
       });
     }
 
@@ -48,22 +62,13 @@ exports.handler = async (event) => {
       number_of_adults: numberOfAdults,
       number_of_children: numberOfChildren,
       dietary_notes: attending === "yes" ? dietaryNotes : "",
+      accommodation_assistance: attending === "yes" ? accommodationAssistance : "",
       message,
       source: "netlify",
       formspree_notified: false,
-      netlify_site_url: process.env.URL || null
+      netlify_site_url: publicSiteUrl
     };
 
-    const supabaseUrl = process.env.SUPABASE_URL;
-    const supabaseServiceRole = process.env.SUPABASE_SERVICE_ROLE_KEY;
-    const formspreeFormId = process.env.FORMSPREE_FORM_ID;
-    const eventName = process.env.RSVP_EVENT_NAME || "Sophia RSVP";
-
-    if (!supabaseUrl || !supabaseServiceRole || !formspreeFormId) {
-      return jsonResponse(500, { error: "Missing server environment variables." });
-    }
-
-    // 1) Save to Supabase
     const dbResponse = await fetch(`${supabaseUrl}/rest/v1/rsvps`, {
       method: "POST",
       headers: {
@@ -75,7 +80,14 @@ exports.handler = async (event) => {
       body: JSON.stringify([row])
     });
 
-    const dbPayload = await dbResponse.json();
+    const dbPayloadText = await dbResponse.text();
+    let dbPayload;
+
+    try {
+      dbPayload = JSON.parse(dbPayloadText);
+    } catch {
+      dbPayload = dbPayloadText;
+    }
 
     if (!dbResponse.ok) {
       return jsonResponse(500, {
@@ -86,21 +98,24 @@ exports.handler = async (event) => {
 
     const saved = Array.isArray(dbPayload) ? dbPayload[0] : null;
 
-    // 2) Forward to Formspree for email notification / inbox
     let formspreeNotified = false;
 
     const formspreeBody = new URLSearchParams({
       event_name: eventName,
       guest_name: guestName,
       email,
+      _replyto: email,
       phone,
       attending,
       number_of_adults: String(numberOfAdults),
       number_of_children: String(numberOfChildren),
       dietary_notes: attending === "yes" ? dietaryNotes : "",
+      accommodation_assistance: attending === "yes" ? accommodationAssistance : "",
       message,
       supabase_id: saved?.id || "",
-      created_at: saved?.created_at || ""
+      created_at: saved?.created_at || "",
+      _subject: `New RSVP from ${guestName}`,
+      _next: `${publicSiteUrl}/thank-you.html`
     });
 
     const formspreeResponse = await fetch(`https://formspree.io/f/${formspreeFormId}`, {
@@ -130,12 +145,10 @@ exports.handler = async (event) => {
       }
     }
 
-    return jsonResponse(201, {
+    return jsonResponse(200, {
       id: saved?.id || null,
       formspreeNotified,
-      message: formspreeNotified
-        ? "RSVP submitted successfully."
-        : "RSVP saved successfully, but email notification could not be sent."
+      message: "RSVP submitted successfully."
     });
   } catch (error) {
     return jsonResponse(500, {
