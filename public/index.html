@@ -59,6 +59,205 @@
       margin-bottom: 26px;
     }
 
+    .storybook-intro {
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, #fffefb, #fff1f8 65%, #f7ecff);
+      border: 2px solid rgba(255, 111, 179, 0.2);
+      border-radius: 34px;
+      margin-bottom: 24px;
+      padding: 32px 24px 38px;
+      box-shadow: var(--shadow);
+    }
+
+    .storybook-intro::before,
+    .storybook-intro::after {
+      content: "";
+      position: absolute;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      filter: blur(2px);
+      opacity: 0.3;
+      pointer-events: none;
+    }
+
+    .storybook-intro::before {
+      top: -52px;
+      left: -36px;
+      background: radial-gradient(circle, #ffb6de, transparent 70%);
+    }
+
+    .storybook-intro::after {
+      right: -42px;
+      bottom: -66px;
+      background: radial-gradient(circle, #f4d5ff, transparent 70%);
+    }
+
+    .storybook-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.1fr;
+      align-items: center;
+      gap: 20px;
+    }
+
+    @media (max-width: 860px) {
+      .storybook-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .anime-princess {
+      position: relative;
+      width: min(100%, 300px);
+      aspect-ratio: 1 / 1;
+      margin: 0 auto;
+      animation: floatUpDown 3.5s ease-in-out infinite;
+    }
+
+    .princess-glow {
+      position: absolute;
+      inset: 8% 8%;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 231, 245, 0.95), rgba(250, 235, 255, 0.35) 70%, transparent);
+    }
+
+    .sparkle-ring {
+      position: absolute;
+      inset: 8%;
+      border-radius: 50%;
+      border: 3px dashed rgba(230, 73, 149, 0.34);
+      animation: spin 16s linear infinite;
+    }
+
+    .sparkle-ring::before,
+    .sparkle-ring::after {
+      content: "✦";
+      position: absolute;
+      font-size: 1.5rem;
+      color: #ff86c5;
+      animation: twinkle 1.8s ease-in-out infinite;
+    }
+
+    .sparkle-ring::before {
+      top: 8%;
+      left: 16%;
+    }
+
+    .sparkle-ring::after {
+      bottom: 10%;
+      right: 14%;
+      animation-delay: 0.9s;
+    }
+
+    .princess-body {
+      position: absolute;
+      inset: 17% 18%;
+      border-radius: 42% 42% 38% 38%;
+      background: linear-gradient(180deg, #fff 0%, #ffe5f2 42%, #ffc2e2 100%);
+      border: 2px solid rgba(255, 111, 179, 0.35);
+      box-shadow: 0 14px 28px rgba(255, 111, 179, 0.2);
+    }
+
+    .princess-hair {
+      position: absolute;
+      top: 8%;
+      left: 18%;
+      right: 18%;
+      height: 38%;
+      border-radius: 46% 46% 50% 50%;
+      background: linear-gradient(180deg, #8f4f7a, #6f385d);
+      animation: sway 3.6s ease-in-out infinite;
+      transform-origin: center top;
+    }
+
+    .princess-face {
+      position: absolute;
+      top: 18%;
+      left: 28%;
+      width: 44%;
+      height: 30%;
+      border-radius: 50%;
+      background: #fff6fa;
+      border: 1px solid rgba(111, 56, 93, 0.28);
+    }
+
+    .princess-face::before,
+    .princess-face::after {
+      content: "";
+      position: absolute;
+      top: 40%;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #6f385d;
+      animation: blink 3s infinite;
+    }
+
+    .princess-face::before {
+      left: 28%;
+    }
+
+    .princess-face::after {
+      right: 28%;
+    }
+
+    .princess-crown {
+      position: absolute;
+      top: 3%;
+      left: 39%;
+      width: 22%;
+      height: 16%;
+      background: linear-gradient(180deg, #ffe999, #ffc63f);
+      clip-path: polygon(0% 100%, 20% 35%, 37% 78%, 50% 18%, 63% 78%, 80% 35%, 100% 100%);
+      filter: drop-shadow(0 2px 0 rgba(173, 111, 0, 0.3));
+      animation: sparklePulse 1.9s ease-in-out infinite;
+    }
+
+    .intro-copy h2 {
+      margin: 0 0 12px;
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      color: #c03380;
+    }
+
+    .intro-copy p {
+      margin: 0;
+      font-size: 1.07rem;
+      line-height: 1.7;
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    @keyframes floatUpDown {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-9px); }
+    }
+
+    @keyframes sway {
+      0%, 100% { transform: rotate(0deg); }
+      50% { transform: rotate(1.8deg); }
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.5; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.18); }
+    }
+
+    @keyframes sparklePulse {
+      0%, 100% { transform: translateY(0); filter: drop-shadow(0 2px 0 rgba(173, 111, 0, 0.3)); }
+      50% { transform: translateY(-2px); filter: drop-shadow(0 2px 6px rgba(255, 214, 77, 0.8)); }
+    }
+
+    @keyframes blink {
+      0%, 45%, 100% { transform: scaleY(1); }
+      47%, 49% { transform: scaleY(0.1); }
+    }
+
     .hero::before,
     .hero::after {
       position: absolute;
@@ -405,6 +604,24 @@
 <body>
   <div class="page">
     <div class="shell">
+      <section class="storybook-intro">
+        <div class="storybook-grid">
+          <div class="anime-princess" aria-hidden="true">
+            <div class="princess-glow"></div>
+            <div class="sparkle-ring"></div>
+            <div class="princess-body"></div>
+            <div class="princess-hair"></div>
+            <div class="princess-face"></div>
+            <div class="princess-crown"></div>
+          </div>
+
+          <div class="intro-copy">
+            <h2>My name is Sophia, and I am the first for Daddy and Mummy.</h2>
+            <p>My birthday is on the 1st, and I am inviting you to my birthday celebration.</p>
+          </div>
+        </div>
+      </section>
+
       <section class="hero">
         <div class="eyebrow">Sophia is ONE</div>
         <h1>The ONE-derland: Welcome to BIG SOPHIA first birthday party</h1>
